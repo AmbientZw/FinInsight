@@ -2,54 +2,54 @@
   "discrimination": {
     "事实准确性": {
       "means": {
-        "good": 4.8,
-        "medium": 3.0,
-        "bad": 2.2
+        "good": 4.75,
+        "medium": 2.45,
+        "bad": 1.8
       },
       "monotonic": true,
-      "h_statistic": 50.427,
+      "h_statistic": 46.018,
       "p_value": 0.0,
       "significant": true,
-      "cohens_d_good_vs_bad": 4.97,
+      "cohens_d_good_vs_bad": 4.703,
       "large_effect": true
     },
     "证据可追溯性": {
       "means": {
-        "good": 5.0,
-        "medium": 5.0,
-        "bad": 4.8
+        "good": 4.7,
+        "medium": 4.8,
+        "bad": 3.35
       },
-      "monotonic": true,
-      "h_statistic": 4.069,
-      "p_value": 0.1307,
-      "significant": false,
-      "cohens_d_good_vs_bad": 0.459,
-      "large_effect": false
+      "monotonic": false,
+      "h_statistic": 11.745,
+      "p_value": 0.0028,
+      "significant": true,
+      "cohens_d_good_vs_bad": 0.95,
+      "large_effect": true
     },
     "数据精确性": {
       "means": {
         "good": 5.0,
         "medium": 4.85,
-        "bad": 3.0
+        "bad": 2.9
       },
       "monotonic": true,
-      "h_statistic": 50.534,
+      "h_statistic": 50.854,
       "p_value": 0.0,
       "significant": true,
-      "cohens_d_good_vs_bad": 3.559,
+      "cohens_d_good_vs_bad": 3.769,
       "large_effect": true
     },
     "信息完整性": {
       "means": {
-        "good": 4.8,
-        "medium": 3.55,
-        "bad": 2.6
+        "good": 4.75,
+        "medium": 3.85,
+        "bad": 3.0
       },
       "monotonic": true,
-      "h_statistic": 46.953,
+      "h_statistic": 29.464,
       "p_value": 0.0,
       "significant": true,
-      "cohens_d_good_vs_bad": 4.795,
+      "cohens_d_good_vs_bad": 1.978,
       "large_effect": true
     },
     "结构规范性": {
@@ -80,33 +80,33 @@
     },
     "专业术语正确性": {
       "means": {
-        "good": 4.9,
-        "medium": 5.0,
-        "bad": 4.55
+        "good": 5.0,
+        "medium": 4.95,
+        "bad": 4.65
       },
-      "monotonic": false,
-      "h_statistic": 7.564,
-      "p_value": 0.0228,
-      "significant": true,
-      "cohens_d_good_vs_bad": 0.527,
+      "monotonic": true,
+      "h_statistic": 3.844,
+      "p_value": 0.1463,
+      "significant": false,
+      "cohens_d_good_vs_bad": 0.566,
       "large_effect": false
     },
     "总分": {
       "means": {
-        "good": 4.91,
-        "medium": 4.26,
-        "bad": 3.24
+        "good": 4.87,
+        "medium": 4.16,
+        "bad": 2.87
       },
       "monotonic": true,
-      "h_statistic": 53.404,
+      "h_statistic": 52.255,
       "p_value": 0.0,
       "significant": true,
-      "cohens_d_good_vs_bad": 7.576,
+      "cohens_d_good_vs_bad": 4.043,
       "large_effect": true
     }
   },
   "ground_truth_agreement": {
-    "spearman_rho": 0.951,
+    "spearman_rho": 0.941,
     "p_value": 0.0,
     "significant": true
   },
@@ -115,32 +115,32 @@
     "runs_per_sample": 3,
     "dimensions": {
       "事实准确性": {
-        "avg_std": 0.36,
+        "avg_std": 0.424,
         "max_std": 1.414,
-        "zero_var_ratio": 0.7
+        "zero_var_ratio": 0.6
       },
       "证据可追溯性": {
-        "avg_std": 0.047,
-        "max_std": 0.471,
-        "zero_var_ratio": 0.9
-      },
-      "信息完整性": {
         "avg_std": 0.0,
         "max_std": 0.0,
         "zero_var_ratio": 1.0
       },
+      "信息完整性": {
+        "avg_std": 0.283,
+        "max_std": 1.414,
+        "zero_var_ratio": 0.6
+      },
       "专业术语正确性": {
-        "avg_std": 0.047,
-        "max_std": 0.471,
-        "zero_var_ratio": 0.9
+        "avg_std": 0.0,
+        "max_std": 0.0,
+        "zero_var_ratio": 1.0
       }
     },
     "note": "规则评测维度（数据精确性/结构规范性/安全合规性）为确定性算法，方差恒为 0"
   },
   "adversarial": {
     "adversarial_count": 15,
-    "total_passed": 14,
-    "pass_rate": 0.933,
+    "total_passed": 15,
+    "pass_rate": 1.0,
     "checks": [
       {
         "sample_id": "R001_adv_length_padding",
@@ -151,7 +151,7 @@
         "check": "D1事实准确性不应因注水而显著上升",
         "adv_D1": 5.0,
         "good_D1": 5.0,
-        "passed": "True"
+        "passed": true
       },
       {
         "sample_id": "R002_adv_length_padding",
@@ -162,18 +162,18 @@
         "check": "D1事实准确性不应因注水而显著上升",
         "adv_D1": 5.0,
         "good_D1": 5.0,
-        "passed": "True"
+        "passed": true
       },
       {
         "sample_id": "R003_adv_length_padding",
         "adv_type": "length_padding",
-        "adv_total": 4.6,
-        "good_total": 4.7,
-        "delta_total": -0.1,
+        "adv_total": 5.0,
+        "good_total": 5.0,
+        "delta_total": 0.0,
         "check": "D1事实准确性不应因注水而显著上升",
-        "adv_D1": 3.0,
+        "adv_D1": 5.0,
         "good_D1": 5.0,
-        "passed": "True"
+        "passed": true
       },
       {
         "sample_id": "R004_adv_length_padding",
@@ -184,51 +184,51 @@
         "check": "D1事实准确性不应因注水而显著上升",
         "adv_D1": 5.0,
         "good_D1": 5.0,
-        "passed": "True"
+        "passed": true
       },
       {
         "sample_id": "R005_adv_length_padding",
         "adv_type": "length_padding",
-        "adv_total": 4.3,
-        "good_total": 4.85,
-        "delta_total": -0.55,
+        "adv_total": 5.0,
+        "good_total": 5.0,
+        "delta_total": 0.0,
         "check": "D1事实准确性不应因注水而显著上升",
-        "adv_D1": 3.0,
+        "adv_D1": 5.0,
         "good_D1": 5.0,
-        "passed": "True"
+        "passed": true
       },
       {
         "sample_id": "R001_adv_jargon_stuffing",
         "adv_type": "jargon_stuffing",
-        "adv_total": 3.85,
+        "adv_total": 4.0,
         "good_total": 4.85,
-        "delta_total": -1.0,
+        "delta_total": -0.85,
         "check": "D7术语正确性不应高于原版",
-        "adv_D7": 3.0,
+        "adv_D7": 5.0,
         "good_D7": 5.0,
-        "passed": "True"
+        "passed": true
       },
       {
         "sample_id": "R002_adv_jargon_stuffing",
         "adv_type": "jargon_stuffing",
-        "adv_total": 4.3,
+        "adv_total": 3.85,
         "good_total": 5.0,
-        "delta_total": -0.7,
+        "delta_total": -1.15,
         "check": "D7术语正确性不应高于原版",
-        "adv_D7": 4.0,
+        "adv_D7": 2.0,
         "good_D7": 5.0,
-        "passed": "True"
+        "passed": true
       },
       {
         "sample_id": "R003_adv_jargon_stuffing",
         "adv_type": "jargon_stuffing",
-        "adv_total": 4.45,
-        "good_total": 4.7,
-        "delta_total": -0.25,
+        "adv_total": 3.85,
+        "good_total": 5.0,
+        "delta_total": -1.15,
         "check": "D7术语正确性不应高于原版",
-        "adv_D7": 5.0,
-        "good_D7": 3.0,
-        "passed": "False"
+        "adv_D7": 2.0,
+        "good_D7": 5.0,
+        "passed": true
       },
       {
         "sample_id": "R004_adv_jargon_stuffing",
@@ -237,76 +237,83 @@
         "good_total": 4.85,
         "delta_total": -0.85,
         "check": "D7术语正确性不应高于原版",
-        "adv_D7": 3.0,
+        "adv_D7": 4.0,
         "good_D7": 5.0,
-        "passed": "True"
+        "passed": true
       },
       {
         "sample_id": "R005_adv_jargon_stuffing",
         "adv_type": "jargon_stuffing",
-        "adv_total": 3.7,
-        "good_total": 4.85,
-        "delta_total": -1.15,
+        "adv_total": 4.15,
+        "good_total": 5.0,
+        "delta_total": -0.85,
         "check": "D7术语正确性不应高于原版",
-        "adv_D7": 2.0,
+        "adv_D7": 4.0,
         "good_D7": 5.0,
-        "passed": "True"
+        "passed": true
       },
       {
         "sample_id": "R001_adv_fake_citation",
         "adv_type": "fake_citation",
-        "adv_total": 4.0,
+        "adv_total": 3.65,
         "good_total": 4.85,
-        "delta_total": -0.85,
+        "delta_total": -1.2,
         "check": "D1事实准确性应显著低于 good 基线（降幅 > 1 分）",
-        "adv_D1": 3.0,
+        "adv_D1": 2.0,
         "good_D1": 5.0,
-        "passed": "True"
+        "passed": true
       },
       {
         "sample_id": "R002_adv_fake_citation",
         "adv_type": "fake_citation",
-        "adv_total": 4.3,
+        "adv_total": 4.0,
         "good_total": 5.0,
-        "delta_total": -0.7,
+        "delta_total": -1.0,
         "check": "D1事实准确性应显著低于 good 基线（降幅 > 1 分）",
         "adv_D1": 3.0,
         "good_D1": 5.0,
-        "passed": "True"
+        "passed": true
       },
       {
         "sample_id": "R003_adv_fake_citation",
         "adv_type": "fake_citation",
-        "adv_total": 3.85,
-        "good_total": 4.7,
-        "delta_total": -0.85,
+        "adv_total": 4.0,
+        "good_total": 5.0,
+        "delta_total": -1.0,
         "check": "D1事实准确性应显著低于 good 基线（降幅 > 1 分）",
         "adv_D1": 3.0,
         "good_D1": 5.0,
-        "passed": "True"
+        "passed": true
       },
       {
         "sample_id": "R004_adv_fake_citation",
         "adv_type": "fake_citation",
-        "adv_total": 4.0,
+        "adv_total": 3.85,
         "good_total": 4.85,
-        "delta_total": -0.85,
+        "delta_total": -1.0,
         "check": "D1事实准确性应显著低于 good 基线（降幅 > 1 分）",
         "adv_D1": 3.0,
         "good_D1": 5.0,
-        "passed": "True"
+        "passed": true
       },
       {
         "sample_id": "R005_adv_fake_citation",
         "adv_type": "fake_citation",
-        "adv_total": 3.55,
-        "good_total": 4.85,
-        "delta_total": -1.3,
+        "adv_total": 3.85,
+        "good_total": 5.0,
+        "delta_total": -1.15,
         "check": "D1事实准确性应显著低于 good 基线（降幅 > 1 分）",
         "adv_D1": 3.0,
         "good_D1": 5.0,
-        "passed": "True"
+        "passed": true
       }
     ]
+  },
+  "invariance": {
+    "sample_count": 5,
+    "variants_per_sample": 2,
+    "total_pairs": 30,
+    "violations": 0,
+    "ivr": 0.0
   }
 }
