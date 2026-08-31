@@ -26,6 +26,7 @@ from evaluators.llm_judge import (
     CompletenessEvaluator,
     TerminologyEvaluator,
 )
+from evaluators.hard_gate import apply_hard_gates
 
 WEIGHTS = {
     "事实准确性": 0.20,
@@ -124,7 +125,13 @@ def evaluate_sample(sample: dict, evaluators) -> dict:
 
     weighted_sum = sum(row.get(dim, 0) * w for dim, w in WEIGHTS.items())
     row["总分"] = round(weighted_sum, 2)
-    row["安全红线"] = safety_red_flag
+
+    # 硬门禁：致命错误封顶总分，不能被平均分稀释
+    dim_scores = {dim: row.get(dim, 0.0) for dim in WEIGHTS}
+    capped_total, gates = apply_hard_gates(weighted_sum, dim_scores)
+    row["封顶后总分"] = capped_total
+    row["硬门禁"] = "; ".join(g["name"] for g in gates) if gates else ""
+    row["安全红线"] = safety_red_flag or any(g["red_flag"] for g in gates)
     row["_failed_dims"] = ",".join(failed_dims)
     return row
 

@@ -4,6 +4,7 @@ import json
 import statistics
 
 from .base import LLMJudgeEvaluator, EvalResult
+from .citation_audit import audit_citations
 from .judge_prompts import (
     FACTUAL_ACCURACY_PROMPT,
     TRACEABILITY_PROMPT,
@@ -83,11 +84,40 @@ class FactualAccuracyEvaluator(_JudgeEvaluatorBase):
 
 
 class TraceabilityEvaluator(_JudgeEvaluatorBase):
-    """D2: Whether conclusions cite source locations."""
+    """D2: Whether conclusions cite source locations.
+
+    混合评测：LLM Judge 判「引用质量」，确定性引用审计裁决「引用是否存在/页码是否真实」
+    并封顶 LLM 分数——让「删除出处标注」类坏样本无法靠 LLM 宽松给分蒙混过关。
+    """
 
     dimension = "证据可追溯性"
     weight = 0.15
     system_prompt = TRACEABILITY_PROMPT
+
+    def evaluate(self, source_text: str, output_text: str, reference=None) -> EvalResult:
+        result = super().evaluate(source_text, output_text, reference)
+        audit = audit_citations(source_text, output_text)
+        ceiling = audit["ceiling"]
+
+        final_score = min(result.score, ceiling)
+        if final_score < result.score:
+            reasoning = (
+                f"[确定性审计] {audit['reason']}；"
+                f"LLM 原始 {result.score:.1f} 分被封顶至 {ceiling}"
+            )
+        else:
+            reasoning = f"{result.reasoning}（引用审计：{audit['reason']}）"
+
+        evidence = list(result.evidence or [])
+        if audit.get("invalid_pages"):
+            evidence.append(f"不存在的页码: {audit['invalid_pages']}")
+
+        return EvalResult(
+            dimension=self.dimension,
+            score=final_score,
+            reasoning=reasoning,
+            evidence=evidence,
+        )
 
 
 class CompletenessEvaluator(_JudgeEvaluatorBase):

@@ -30,7 +30,11 @@ def load_eval_results() -> pd.DataFrame:
     csv_path = RESULTS_DIR / "eval_table.csv"
     if not csv_path.exists():
         raise FileNotFoundError(f"请先运行评测: {csv_path}")
-    return pd.read_csv(csv_path)
+    df = pd.read_csv(csv_path)
+    # 新框架：硬门禁后的「封顶后总分」作为判别/秩相关/对抗的总分目标
+    if "封顶后总分" in df.columns:
+        df["总分"] = df["封顶后总分"]
+    return df
 
 
 def _cohens_d(a: pd.Series, b: pd.Series) -> float:
@@ -231,6 +235,78 @@ def adversarial_validation(df: pd.DataFrame) -> dict:
     }
 
 
+def _equivalence_variants(output_text: str) -> list[str]:
+    """生成等价变形：list 条目重排 + 紧凑 JSON（空白变化）。"""
+    try:
+        data = json.loads(output_text)
+    except (json.JSONDecodeError, TypeError):
+        return []
+    if not isinstance(data, dict):
+        return []
+
+    variants = []
+    # 变形 1：每个 list 字段条目倒序
+    reordered = {}
+    for k, v in data.items():
+        if isinstance(v, list) and len(v) > 1:
+            reordered[k] = list(reversed(v))
+        else:
+            reordered[k] = v
+    variants.append(json.dumps(reordered, ensure_ascii=False, indent=2))
+    # 变形 2：紧凑 JSON（无缩进空白）
+    variants.append(json.dumps(data, ensure_ascii=False, separators=(",", ":")))
+    return variants
+
+
+def invariance_validation(n_samples: int = 5) -> dict:
+    """5.4 等价不变性（IVR）：重排/空白变化不应改变规则维度分数。
+
+    IVR 等价不变性：等价变形（不改变语义）应得到与原答案一致的分数。
+    仅用规则维度（D3/D5/D6），零 API 成本。
+    """
+    from evaluators.rules import (
+        DataPrecisionEvaluator,
+        StructureEvaluator,
+        SafetyComplianceEvaluator,
+    )
+
+    evaluators = [
+        DataPrecisionEvaluator(),
+        StructureEvaluator(),
+        SafetyComplianceEvaluator(),
+    ]
+
+    samples_file = ROOT / "samples" / "golden" / "summary_samples.jsonl"
+    samples = []
+    with open(samples_file) as f:
+        for line in f:
+            s = json.loads(line)
+            if s.get("quality_level") == "good":
+                samples.append(s)
+            if len(samples) >= n_samples:
+                break
+
+    violations = 0
+    total_pairs = 0
+    for s in samples:
+        source = s["source_text"]
+        base_scores = {ev.dimension: ev.evaluate(source, s["output"]).score for ev in evaluators}
+        for variant in _equivalence_variants(s["output"]):
+            v_scores = {ev.dimension: ev.evaluate(source, variant).score for ev in evaluators}
+            for dim in base_scores:
+                total_pairs += 1
+                if abs(v_scores[dim] - base_scores[dim]) > 1e-6:
+                    violations += 1
+
+    return {
+        "sample_count": len(samples),
+        "variants_per_sample": 2,
+        "total_pairs": total_pairs,
+        "violations": violations,
+        "ivr": round(violations / total_pairs, 6) if total_pairs else None,
+    }
+
+
 def run(skip_consistency: bool = False, consistency_samples: int = 10, n_runs: int = 3):
     df = load_eval_results()
     report = {}
@@ -267,6 +343,11 @@ def run(skip_consistency: bool = False, consistency_samples: int = 10, n_runs: i
     print(f"  对抗样本数: {adv.get('adversarial_count', 0)}, 通过率: {adv.get('pass_rate', 'N/A')}")
     for c in adv.get("checks", []):
         print(f"    {'✓' if c['passed'] else '✗'} {c['sample_id']} [{c['adv_type']}] {c['check']}")
+
+    print("\n=== 5.4 等价不变性（IVR）===")
+    inv = invariance_validation()
+    report["invariance"] = inv
+    print(f"  IVR = {inv['ivr']}（{inv['violations']}/{inv['total_pairs']} 对违反不变性）")
 
     RESULTS_DIR.mkdir(parents=True, exist_ok=True)
     out_path = RESULTS_DIR / "validation_report.json"

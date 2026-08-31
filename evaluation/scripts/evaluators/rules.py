@@ -27,15 +27,26 @@ BOUNDARY_VIOLATIONS = [
 
 
 class DataPrecisionEvaluator(RuleBasedEvaluator):
-    """D3: Check if numerical data in output matches source text."""
+    """D3: Check if numerical data (digit + unit) in output matches source text.
+
+    除数字串比对外，增加「单位口径」校验：数字对但单位错（如"2.1万亿元"写成"2.1万元"）
+    会被视为不匹配，捕捉数量级/口径错误。
+    """
 
     dimension = "数据精确性"
     weight = 0.15
 
+    # 数值 + 单位（长单位优先，避免"万亿元"被截成"万"）
+    _NUM_UNIT_RE = re.compile(
+        r"([\d,]+(?:\.\d+)?)\s*(万亿元|千亿元|百亿元|十亿元|亿元|"
+        r"千万元|百万元|十万元|万元|亿美元|美元|港元|"
+        r"万亿|亿|万|元|%|％|倍|点)"
+    )
+
     def evaluate(self, source_text: str, output_text: str, reference=None) -> EvalResult:
-        num_pattern = r"[\d,]+\.?\d*\s*[%％万亿元美元倍]"
-        output_numbers = re.findall(num_pattern, output_text)
-        if not output_numbers:
+        source_norm = re.sub(r"[,\s]", "", source_text)
+        matches = list(self._NUM_UNIT_RE.finditer(output_text))
+        if not matches:
             return EvalResult(
                 dimension=self.dimension,
                 score=3.0,
@@ -44,14 +55,15 @@ class DataPrecisionEvaluator(RuleBasedEvaluator):
 
         matched = 0
         mismatched = []
-        for num_str in output_numbers:
-            core_num = re.sub(r"[^\d.,]", "", num_str).strip(",.")
-            if core_num and core_num in source_text:
+        for m in matches:
+            # 数字 + 单位整体（去逗号/空白）须在原文中精确出现
+            full_norm = re.sub(r"[,\s]", "", m.group(0))
+            if full_norm and full_norm in source_norm:
                 matched += 1
             else:
-                mismatched.append(num_str)
+                mismatched.append(m.group(0))
 
-        total = len(output_numbers)
+        total = len(matches)
         ratio = matched / total if total > 0 else 0
 
         if ratio >= 0.95:
@@ -68,7 +80,7 @@ class DataPrecisionEvaluator(RuleBasedEvaluator):
         return EvalResult(
             dimension=self.dimension,
             score=score,
-            reasoning=f"数值匹配率 {ratio:.0%} ({matched}/{total})",
+            reasoning=f"数值+单位匹配率 {ratio:.0%} ({matched}/{total})",
             evidence=mismatched[:5],
         )
 

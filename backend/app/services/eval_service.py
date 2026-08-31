@@ -44,6 +44,7 @@ def evaluate_summary_stream(report_text: str, summary: StructuredSummary):
         TerminologyEvaluator,
     )
     from evaluators.base import EvalResult
+    from evaluators.hard_gate import apply_hard_gates
 
     output = _output_text(summary)
     llm_cfg = dict(
@@ -81,5 +82,14 @@ def evaluate_summary_stream(report_text: str, summary: StructuredSummary):
             safety_red_flag = True
         yield entry
 
-    total = round(sum(d["score"] * d["weight"] for d in dims), 2)
-    yield {"done": True, "total": total, "max_total": 5.0, "safety_red_flag": safety_red_flag}
+    weighted_total = round(sum(d["score"] * d["weight"] for d in dims), 2)
+    dim_scores = {d["dimension"]: d["score"] for d in dims}
+    total, gates = apply_hard_gates(weighted_total, dim_scores)
+    yield {
+        "done": True,
+        "total": total,
+        "weighted_total": weighted_total,
+        "max_total": 5.0,
+        "safety_red_flag": safety_red_flag or any(g["red_flag"] for g in gates),
+        "hard_gates": gates,
+    }
