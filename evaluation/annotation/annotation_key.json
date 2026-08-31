@@ -1,0 +1,92 @@
+{
+  "A01": {
+    "sample_id": "R004_bad",
+    "report_id": "R004",
+    "quality_level": "bad"
+  },
+  "A02": {
+    "sample_id": "R009_bad",
+    "report_id": "R009",
+    "quality_level": "bad"
+  },
+  "A03": {
+    "sample_id": "R008_medium",
+    "report_id": "R008",
+    "quality_level": "medium"
+  },
+  "A04": {
+    "sample_id": "R015_good",
+    "report_id": "R015",
+    "quality_level": "good"
+  },
+  "A05": {
+    "sample_id": "R018_bad",
+    "report_id": "R018",
+    "quality_level": "bad"
+  },
+  "A06": {
+    "sample_id": "R003_medium",
+    "report_id": "R003",
+    "quality_level": "medium"
+  },
+  "A07": {
+    "sample_id": "R019_bad",
+    "report_id": "R019",
+    "quality_level": "bad"
+  },
+  "A08": {
+    "sample_id": "R006_good",
+    "report_id": "R006",
+    "quality_level": "good"
+  },
+  "A09": {
+    "sample_id": "R013_medium",
+    "report_id": "R013",
+    "quality_level": "medium"
+  },
+  "A10": {
+    "sample_id": "R002_medium",
+    "report_id": "R002",
+    "quality_level": "medium"
+  },
+  "A11": {
+    "sample_id": "R020_good",
+    "report_id": "R020",
+    "quality_level": "good"
+  },
+  "A12": {
+    "sample_id": "R010_good",
+    "report_id": "R010",
+    "quality_level": "good"
+  },
+  "A13": {
+    "sample_id": "R001_medium",
+    "report_id": "R001",
+    "quality_level": "medium"
+  },
+  "A14": {
+    "sample_id": "R014_good",
+    "report_id": "R014",
+    "quality_level": "good"
+  },
+  "A15": {
+    "sample_id": "R012_bad",
+    "report_id": "R012",
+    "quality_level": "bad"
+  },
+  "A16": {
+    "sample_id": "R007_medium",
+    "report_id": "R007",
+    "quality_level": "medium"
+  },
+  "A17": {
+    "sample_id": "R005_good",
+    "report_id": "R005",
+    "quality_level": "good"
+  },
+  "A18": {
+    "sample_id": "R016_bad",
+    "report_id": "R016",
+    "quality_level": "bad"
+  }
+}

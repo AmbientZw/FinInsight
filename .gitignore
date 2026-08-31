@@ -12,3 +12,7 @@ frontend/dist/
 .DS_Store
 *.log
 backend/uploads/
+
+# 人工标注分发包及解压产物（构建产物）
+evaluation/annotation/*.zip
+evaluation/annotation/FinInsight_人工标注任务包/
