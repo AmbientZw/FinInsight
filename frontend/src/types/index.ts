@@ -28,3 +28,8 @@ export interface EvalDimension {
   reasoning: string;
   evidence: string[];
 }
+
+export interface CompareReportInput {
+  title: string;
+  summary: StructuredSummary;
+}

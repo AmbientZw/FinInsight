@@ -1,7 +1,7 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
-from app.api.routes import reports, summary, qa, eval_routes
+from app.api.routes import reports, summary, qa, eval_routes, compare
 
 app = FastAPI(
     title="FinInsight API",
@@ -21,6 +21,7 @@ app.include_router(reports.router, prefix="/api")
 app.include_router(summary.router, prefix="/api")
 app.include_router(qa.router, prefix="/api")
 app.include_router(eval_routes.router, prefix="/api")
+app.include_router(compare.router, prefix="/api")
 
 
 @app.get("/api/health")

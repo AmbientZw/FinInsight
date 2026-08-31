@@ -43,3 +43,12 @@ class EvalResult(BaseModel):
     scores: list[EvalScore]
     overall_score: float
     safety_red_flag: bool = False
+
+
+class CompareReportInput(BaseModel):
+    title: str
+    summary: StructuredSummary
+
+
+class CompareRequest(BaseModel):
+    reports: list[CompareReportInput]

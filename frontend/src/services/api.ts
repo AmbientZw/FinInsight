@@ -4,6 +4,7 @@ import type {
   StructuredSummary,
   QAResponse,
   EvalDimension,
+  CompareReportInput,
 } from '../types';
 
 const api = axios.create({ baseURL: '/api' });
@@ -159,6 +160,23 @@ export async function askQuestionStream(
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ report_id: reportId, question, reasoning_effort: 'high' }),
+    },
+    (p) => {
+      if (typeof p === 'string') onDelta(p);
+    },
+  );
+}
+
+export async function compareReportsStream(
+  reports: CompareReportInput[],
+  onDelta: (text: string) => void,
+): Promise<string> {
+  return consumeSSE(
+    '/api/compare/stream',
+    {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ reports }),
     },
     (p) => {
       if (typeof p === 'string') onDelta(p);
