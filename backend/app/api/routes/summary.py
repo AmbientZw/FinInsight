@@ -4,6 +4,7 @@ from fastapi import APIRouter
 from fastapi.responses import StreamingResponse
 
 from app.api.routes.reports import get_report_text
+from app.core.number_audit import verify_flags
 from app.core.schemas import StructuredSummary
 from app.services.summary_service import generate_summary, generate_summary_stream
 
@@ -23,14 +24,21 @@ async def create_summary_stream(report_id: str):
     stream = generate_summary_stream(text)
 
     def event_generator():
+        full = ""
         try:
             for chunk in stream:
                 if chunk.choices and chunk.choices[0].delta.content:
+                    piece = chunk.choices[0].delta.content
+                    full += piece
                     yield (
                         "data: "
-                        + json.dumps(chunk.choices[0].delta.content, ensure_ascii=False)
+                        + json.dumps(piece, ensure_ascii=False)
                         + "\n\n"
                     )
+            # 生成完成后做确定性数字校验，把不匹配的数字作为疑点下发
+            flags = verify_flags(text, full)
+            if flags:
+                yield "data: " + json.dumps({"verify": flags}, ensure_ascii=False) + "\n\n"
             yield "data: [DONE]\n\n"
         except Exception as e:  # noqa: BLE001
             yield "data: [ERROR] " + json.dumps(str(e), ensure_ascii=False) + "\n\n"

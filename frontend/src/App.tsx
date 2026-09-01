@@ -9,8 +9,8 @@ import type { ReportMeta, StructuredSummary } from './types';
 
 type Tab = 'summary' | 'qa' | 'eval' | 'compare';
 
-// 测试阶段显示「评分」标签页；交付时置为 false 即可隐藏
-const SHOW_EVAL = true;
+// 评分（测试）标签页：交付版隐藏；需要调试时改回 true
+const SHOW_EVAL = false;
 
 interface ReportEntry {
   meta: ReportMeta;
@@ -73,11 +73,11 @@ function App() {
       </header>
 
       <main className="max-w-5xl mx-auto p-6">
-        {library.length === 0 && !showUploader && (
+        {library.length === 0 && !showUploader && !loading && (
           <ReportUploader onUploaded={handleUploaded} />
         )}
 
-        {showUploader && (
+        {showUploader && !loading && (
           <div className="mb-6">
             <div className="flex items-center justify-between mb-2">
               <p className="text-sm font-medium text-gray-600">添加另一份研报</p>
@@ -89,6 +89,33 @@ function App() {
               </button>
             </div>
             <ReportUploader onUploaded={handleUploaded} />
+          </div>
+        )}
+
+        {loading && (
+          <div className="mb-6">
+            <div className="text-center mb-3">
+              <div className="animate-spin inline-block w-8 h-8 border-4 border-blue-400 border-t-transparent rounded-full" />
+              <p className="text-gray-500 mt-2">
+                正在调用 Hy3 生成结构化摘要...
+              </p>
+            </div>
+            {streamText && (
+              <div>
+                <p className="text-xs text-gray-400 mb-1">
+                  模型原始输出（实时）
+                </p>
+                <pre className="bg-gray-900 text-gray-100 text-xs rounded-lg p-4 overflow-auto max-h-80 whitespace-pre-wrap">
+                  {streamText}
+                </pre>
+              </div>
+            )}
+          </div>
+        )}
+
+        {error && (
+          <div className="p-4 bg-red-50 border border-red-200 rounded-lg text-red-700 mb-4">
+            {error}
           </div>
         )}
 
@@ -161,33 +188,6 @@ function App() {
                 多报告对比{library.length < 2 ? '（需 ≥2 份）' : ''}
               </button>
             </div>
-
-            {loading && (
-              <div className="mb-6">
-                <div className="text-center mb-3">
-                  <div className="animate-spin inline-block w-8 h-8 border-4 border-blue-400 border-t-transparent rounded-full" />
-                  <p className="text-gray-500 mt-2">
-                    正在调用 Hy3 生成结构化摘要...
-                  </p>
-                </div>
-                {streamText && (
-                  <div>
-                    <p className="text-xs text-gray-400 mb-1">
-                      模型原始输出（实时）
-                    </p>
-                    <pre className="bg-gray-900 text-gray-100 text-xs rounded-lg p-4 overflow-auto max-h-80 whitespace-pre-wrap">
-                      {streamText}
-                    </pre>
-                  </div>
-                )}
-              </div>
-            )}
-
-            {error && (
-              <div className="p-4 bg-red-50 border border-red-200 rounded-lg text-red-700 mb-4">
-                {error}
-              </div>
-            )}
 
             {tab === 'summary' && <SummaryView summary={current.summary} />}
             {tab === 'qa' && <QAChat reportId={current.meta.id} />}

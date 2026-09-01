@@ -1,4 +1,4 @@
-from pydantic import BaseModel
+from pydantic import BaseModel, Field
 
 
 class ReportMeta(BaseModel):
@@ -9,6 +9,18 @@ class ReportMeta(BaseModel):
     char_count: int = 0
 
 
+class ChartPoint(BaseModel):
+    label: str
+    value: float
+
+
+class Chart(BaseModel):
+    chart_type: str = "bar"  # bar | line | pie
+    title: str = ""
+    unit: str = ""
+    data: list[ChartPoint] = Field(default_factory=list)
+
+
 class StructuredSummary(BaseModel):
     core_conclusions: list[str]
     key_data: list[str]
@@ -16,6 +28,7 @@ class StructuredSummary(BaseModel):
     investment_advice: list[str]
     points_to_verify: list[str]
     disclaimer: str
+    charts: list[Chart] = Field(default_factory=list)
 
 
 class QARequest(BaseModel):

@@ -122,6 +122,7 @@ export function parseSummary(raw: string): StructuredSummary {
       investment_advice: data.investment_advice ?? [],
       points_to_verify: data.points_to_verify ?? [],
       disclaimer: data.disclaimer ?? DISCLAIMER,
+      charts: Array.isArray(data.charts) ? data.charts : [],
     };
   } catch {
     return {
@@ -131,6 +132,7 @@ export function parseSummary(raw: string): StructuredSummary {
       investment_advice: [],
       points_to_verify: ['JSON解析失败，请检查模型输出格式'],
       disclaimer: DISCLAIMER,
+      charts: [],
     };
   }
 }
@@ -139,14 +141,28 @@ export async function generateSummaryStream(
   reportId: string,
   onDelta: (text: string) => void,
 ): Promise<StructuredSummary> {
+  let verifyFlags: string[] = [];
   const raw = await consumeSSE(
     `/api/summary/${reportId}/stream`,
     { method: 'POST' },
     (p) => {
-      if (typeof p === 'string') onDelta(p);
+      if (typeof p === 'string') {
+        onDelta(p);
+      } else if (
+        p &&
+        typeof p === 'object' &&
+        'verify' in p &&
+        Array.isArray((p as { verify: unknown }).verify)
+      ) {
+        verifyFlags = (p as { verify: string[] }).verify;
+      }
     },
   );
-  return parseSummary(raw);
+  const summary = parseSummary(raw);
+  if (verifyFlags.length > 0) {
+    summary.points_to_verify = [...summary.points_to_verify, ...verifyFlags];
+  }
+  return summary;
 }
 
 export async function askQuestionStream(

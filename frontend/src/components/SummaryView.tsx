@@ -1,4 +1,5 @@
 import type { StructuredSummary } from '../types';
+import ChartsView from './ChartsView';
 
 interface Props {
   summary: StructuredSummary;
@@ -27,6 +28,7 @@ export default function SummaryView({ summary }: Props) {
 
       <Section title="核心结论" items={summary.core_conclusions} color="text-blue-700" />
       <Section title="关键数据" items={summary.key_data} color="text-green-700" />
+      <ChartsView charts={summary.charts} />
       <Section title="主要风险" items={summary.main_risks} color="text-red-700" />
       <Section title="投资建议" items={summary.investment_advice} color="text-purple-700" />
       <Section title="需进一步核实的疑点" items={summary.points_to_verify} color="text-amber-700" />

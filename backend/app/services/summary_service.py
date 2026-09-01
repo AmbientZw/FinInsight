@@ -1,8 +1,11 @@
 import json
 
 from app.core.llm_client import hy3_client, DISCLAIMER
+from app.core.number_audit import verify_flags
 from app.core.prompts import SUMMARY_SYSTEM_PROMPT, SUMMARY_USER_PROMPT
-from app.core.schemas import StructuredSummary
+from app.core.schemas import Chart, ChartPoint, StructuredSummary
+
+_ALLOWED_CHART_TYPES = {"bar", "line", "pie"}
 
 
 def _summary_messages(report_text: str) -> list[dict]:
@@ -13,6 +16,43 @@ def _summary_messages(report_text: str) -> list[dict]:
             "content": SUMMARY_USER_PROMPT.format(report_text=report_text),
         },
     ]
+
+
+def _parse_charts(raw_charts) -> list[Chart]:
+    """把模型输出的 charts 字段安全地解析为 Chart 列表，非法条目丢弃（不阻断摘要）。"""
+    if not isinstance(raw_charts, list):
+        return []
+    charts: list[Chart] = []
+    for c in raw_charts[:4]:
+        if not isinstance(c, dict):
+            continue
+        points: list[ChartPoint] = []
+        raw_data = c.get("data")
+        if isinstance(raw_data, list):
+            for p in raw_data[:12]:
+                if not isinstance(p, dict):
+                    continue
+                try:
+                    value = float(p.get("value"))
+                except (TypeError, ValueError):
+                    continue
+                label = str(p.get("label", "")).strip()
+                if label:
+                    points.append(ChartPoint(label=label, value=value))
+        if not points:
+            continue
+        chart_type = str(c.get("chart_type", "bar")).lower()
+        if chart_type not in _ALLOWED_CHART_TYPES:
+            chart_type = "bar"
+        charts.append(
+            Chart(
+                chart_type=chart_type,
+                title=str(c.get("title", "")).strip(),
+                unit=str(c.get("unit", "")).strip(),
+                data=points,
+            )
+        )
+    return charts
 
 
 def generate_summary(report_text: str) -> StructuredSummary:
@@ -39,14 +79,21 @@ def generate_summary(report_text: str) -> StructuredSummary:
             disclaimer=DISCLAIMER,
         )
 
-    return StructuredSummary(
+    summary = StructuredSummary(
         core_conclusions=data.get("core_conclusions", []),
         key_data=data.get("key_data", []),
         main_risks=data.get("main_risks", []),
         investment_advice=data.get("investment_advice", []),
         points_to_verify=data.get("points_to_verify", []),
         disclaimer=data.get("disclaimer", DISCLAIMER),
+        charts=_parse_charts(data.get("charts", [])),
     )
+
+    # 确定性数字校验：把与原文对不上的数字兜底标进疑点（不依赖模型自觉）
+    flags = verify_flags(report_text, cleaned)
+    if flags:
+        summary.points_to_verify = [*summary.points_to_verify, *flags]
+    return summary
 
 
 def generate_summary_stream(report_text: str):
