@@ -122,6 +122,28 @@ def remove_field(data: dict, field: str) -> dict:
     return data
 
 
+def remove_citations(data: dict, n: int) -> dict:
+    """删除 n 条次要条目的出处标注（追溯性瑕疵），不触碰任何数字。
+
+    用于构造「中」档：数字保持 100% 正确，仅让个别条目缺「（来源：第X页）」标注，
+    模拟真实世界中"数据对、但出处标注不严谨"的中间档质量。
+    """
+    import random
+    random.seed(42)
+    removed = 0
+    for field in ["key_data", "main_risks", "investment_advice", "core_conclusions"]:
+        items = data.get(field, [])
+        for i in range(len(items)):
+            if removed >= n:
+                break
+            new_item = re.sub(r"（来源[：:]\s*第\s*\d+\s*页）", "", items[i])
+            if new_item != items[i]:
+                items[i] = new_item
+                removed += 1
+        data[field] = items
+    return data
+
+
 def corrupt_structure(output: str) -> str:
     """破坏 JSON 结构，输出为自由文本。"""
     data = _load_json(output)
@@ -231,9 +253,10 @@ def build_samples():
         data = _load_json(raw)
         if not data:
             continue
-        medium = inject_number_error(data, 1)
-        # 删除次要字段 points_to_verify 模拟信息遗漏
-        medium = remove_field(medium, "points_to_verify")
+        # 「中」= 数字正确 + 非致命追溯/完整性瑕疵（不注入数字错误——
+        # 金融场景对数字错误零容忍，「错 1 处」≈「错 3 处」都会被视为「差」）
+        medium = remove_citations(data, 2)              # 删 2 条出处标注 → 追溯性瑕疵
+        medium = remove_field(medium, "points_to_verify")  # 删次要字段 → 完整性瑕疵
         all_samples.append({
             "sample_id": f"{report['id']}_medium",
             "report_id": report["id"],
