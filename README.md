@@ -27,6 +27,16 @@ FinInsight 是 2026 腾讯犀牛鸟开源人才培养计划「腾讯混元大语
 | 🔀 多报告对比 | 跨报告观点对比与矛盾检测 |
 | 📋 自动评估 | 七维 Rubric 评测 + 硬门禁 + 有效性验证（判别力 / 一致性 / 对抗 / 等价不变性） |
 
+## 演示
+
+完整流程（上传 → 结构化摘要 → 图表可视化 → 问答）：
+
+![FinInsight 完整演示](assets/demo-full.gif)
+
+摘要与图表速览：
+
+![FinInsight 摘要与图表](assets/demo-short.gif)
+
 ## 架构
 
 ```mermaid
