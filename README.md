@@ -75,7 +75,7 @@ flowchart LR
 
 ## 当前可验证结果
 
-以下数字来自已落盘的评测（75 个样本：好 / 中 / 差各 20 + 对抗 15，覆盖 4 行业 × 3 难度），完整证据见 [docs/分析报告.md](docs/分析报告.md) 与 [evaluation/results/](evaluation/results/)。
+以下数字来自已落盘的评测（75 个样本：好 / 中 / 差各 20 + 对抗 15，覆盖 4 行业 × 3 难度），完整证据见 [docs/分析报告.md](docs/分析报告.md) 与 [evaluation/results/](evaluation/results/)，评测方法详见 [docs/评估方法说明.md](docs/评估方法说明.md)。
 
 | 验证项 | 结果 | 证据 |
 |--------|------|------|
@@ -164,7 +164,7 @@ python evaluation/validation/run_validation.py
 │   ├── scripts/evaluators/  # rules / llm_judge / citation_audit / hard_gate
 │   ├── results/             # eval_table.csv / full_evaluation.json / validation_report.json
 │   └── validation/          # 有效性验证
-└── docs/                    # 分析报告 / Demo 脚本
+└── docs/                    # 分析报告 / 评估方法说明 / Demo 脚本
 ```
 
 ## 数据来源与免责声明
