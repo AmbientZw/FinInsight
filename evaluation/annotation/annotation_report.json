@@ -1,0 +1,226 @@
+{
+  "n_raters": 3,
+  "n_samples": 18,
+  "fleiss_kappa": 1.0,
+  "spearman_vs_eval_rho": 0.847,
+  "spearman_p": 0.0,
+  "majority_vs_truth_hit_rate": 0.667,
+  "per_sample": [
+    {
+      "anonymous_id": "A01",
+      "sample_id": "R004_bad",
+      "truth_level": "差",
+      "ratings": [
+        "差",
+        "差",
+        "差"
+      ],
+      "majority": "差",
+      "eval_total": 2.0
+    },
+    {
+      "anonymous_id": "A02",
+      "sample_id": "R009_bad",
+      "truth_level": "差",
+      "ratings": [
+        "差",
+        "差",
+        "差"
+      ],
+      "majority": "差",
+      "eval_total": 3.35
+    },
+    {
+      "anonymous_id": "A03",
+      "sample_id": "R008_medium",
+      "truth_level": "中",
+      "ratings": [
+        "中",
+        "中",
+        "中"
+      ],
+      "majority": "中",
+      "eval_total": 4.35
+    },
+    {
+      "anonymous_id": "A04",
+      "sample_id": "R015_good",
+      "truth_level": "好",
+      "ratings": [
+        "好",
+        "好",
+        "好"
+      ],
+      "majority": "好",
+      "eval_total": 4.85
+    },
+    {
+      "anonymous_id": "A05",
+      "sample_id": "R018_bad",
+      "truth_level": "差",
+      "ratings": [
+        "差",
+        "差",
+        "差"
+      ],
+      "majority": "差",
+      "eval_total": 3.0
+    },
+    {
+      "anonymous_id": "A06",
+      "sample_id": "R003_medium",
+      "truth_level": "中",
+      "ratings": [
+        "差",
+        "差",
+        "差"
+      ],
+      "majority": "差",
+      "eval_total": 4.35
+    },
+    {
+      "anonymous_id": "A07",
+      "sample_id": "R019_bad",
+      "truth_level": "差",
+      "ratings": [
+        "差",
+        "差",
+        "差"
+      ],
+      "majority": "差",
+      "eval_total": 2.0
+    },
+    {
+      "anonymous_id": "A08",
+      "sample_id": "R006_good",
+      "truth_level": "好",
+      "ratings": [
+        "好",
+        "好",
+        "好"
+      ],
+      "majority": "好",
+      "eval_total": 4.7
+    },
+    {
+      "anonymous_id": "A09",
+      "sample_id": "R013_medium",
+      "truth_level": "中",
+      "ratings": [
+        "差",
+        "差",
+        "差"
+      ],
+      "majority": "差",
+      "eval_total": 4.35
+    },
+    {
+      "anonymous_id": "A10",
+      "sample_id": "R002_medium",
+      "truth_level": "中",
+      "ratings": [
+        "差",
+        "差",
+        "差"
+      ],
+      "majority": "差",
+      "eval_total": 4.2
+    },
+    {
+      "anonymous_id": "A11",
+      "sample_id": "R020_good",
+      "truth_level": "好",
+      "ratings": [
+        "好",
+        "好",
+        "好"
+      ],
+      "majority": "好",
+      "eval_total": 4.5
+    },
+    {
+      "anonymous_id": "A12",
+      "sample_id": "R010_good",
+      "truth_level": "好",
+      "ratings": [
+        "中",
+        "中",
+        "中"
+      ],
+      "majority": "中",
+      "eval_total": 4.6
+    },
+    {
+      "anonymous_id": "A13",
+      "sample_id": "R001_medium",
+      "truth_level": "中",
+      "ratings": [
+        "差",
+        "差",
+        "差"
+      ],
+      "majority": "差",
+      "eval_total": 4.0
+    },
+    {
+      "anonymous_id": "A14",
+      "sample_id": "R014_good",
+      "truth_level": "好",
+      "ratings": [
+        "好",
+        "好",
+        "好"
+      ],
+      "majority": "好",
+      "eval_total": 4.85
+    },
+    {
+      "anonymous_id": "A15",
+      "sample_id": "R012_bad",
+      "truth_level": "差",
+      "ratings": [
+        "差",
+        "差",
+        "差"
+      ],
+      "majority": "差",
+      "eval_total": 3.65
+    },
+    {
+      "anonymous_id": "A16",
+      "sample_id": "R007_medium",
+      "truth_level": "中",
+      "ratings": [
+        "差",
+        "差",
+        "差"
+      ],
+      "majority": "差",
+      "eval_total": 3.75
+    },
+    {
+      "anonymous_id": "A17",
+      "sample_id": "R005_good",
+      "truth_level": "好",
+      "ratings": [
+        "好",
+        "好",
+        "好"
+      ],
+      "majority": "好",
+      "eval_total": 5.0
+    },
+    {
+      "anonymous_id": "A18",
+      "sample_id": "R016_bad",
+      "truth_level": "差",
+      "ratings": [
+        "差",
+        "差",
+        "差"
+      ],
+      "majority": "差",
+      "eval_total": 2.0
+    }
+  ]
+}
