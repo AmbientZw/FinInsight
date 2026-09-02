@@ -307,6 +307,102 @@ def invariance_validation(n_samples: int = 5) -> dict:
     }
 
 
+# 评估器消融的三臂定义：每臂由若干维度组成，分数按权重归一化回 0–5。
+# D2（证据可追溯性）本身是「LLM Judge + 确定性引用审计封顶」的混合维度，
+# 故不归入纯规则/纯 Judge 任一臂；「混合」臂直接用封顶后总分（7 维 + 硬门禁）。
+ABLATION_ARMS = {
+    "纯规则 (D3+D5+D6)": (
+        ["数据精确性", "结构规范性", "安全合规性"],
+        {"数据精确性": 0.15, "结构规范性": 0.10, "安全合规性": 0.10},
+    ),
+    "纯Judge (D1+D4+D7)": (
+        ["事实准确性", "信息完整性", "专业术语正确性"],
+        {"事实准确性": 0.20, "信息完整性": 0.15, "专业术语正确性": 0.15},
+    ),
+}
+
+
+def _arm_discrimination(df: pd.DataFrame, col: str) -> dict:
+    """单列（评估器臂得分）的 good/medium/bad 判别力。"""
+    groups = {}
+    for level in ["good", "medium", "bad"]:
+        subset = df[df["quality_level"] == level][col].dropna()
+        if len(subset):
+            groups[level] = subset
+    means = {k: round(float(v.mean()), 2) for k, v in groups.items()}
+    monotonic = means.get("good", -1) >= means.get("medium", -1) >= means.get("bad", -1)
+    d = _cohens_d(groups.get("good", pd.Series()), groups.get("bad", pd.Series())) \
+        if "good" in groups and "bad" in groups else float("nan")
+    return {
+        "means": means,
+        "monotonic": bool(monotonic),
+        "cohens_d_good_vs_bad": round(float(d), 3) if not np.isnan(d) else None,
+    }
+
+
+def _renorm_arm_score(row: pd.Series, dims: list[str], weights: dict) -> float:
+    total_w = sum(weights[d] for d in dims)
+    if total_w == 0:
+        return float("nan")
+    return sum(row.get(d, 0.0) * weights[d] for d in dims) / total_w
+
+
+def ablation_validation(df: pd.DataFrame) -> dict:
+    """5.5 评估器消融：纯规则 / 纯 Judge / 混合 三臂判别力对比 + 各维度触发诊断。
+
+    证明「模型提议、代码裁决」的分工必要性：确定性错误（数字/结构/合规）由规则层裁决，
+    语义错误（跨报告混入）由 LLM Judge 裁决，引用错误由「LLM+审计封顶」混合裁决——
+    任一单臂都会留下盲区，混合才能覆盖全部错误类型。
+    """
+    arms = {}
+    for name, (dims, weights) in ABLATION_ARMS.items():
+        df["_arm"] = df.apply(lambda r: _renorm_arm_score(r, dims, weights), axis=1)
+        arms[name] = _arm_discrimination(df, "_arm")
+    # 混合臂：直接用封顶后总分（load_eval_results 已把「封顶后总分」复制到「总分」列）
+    arms["混合 (7维 + 硬门禁)"] = _arm_discrimination(df, "总分")
+
+    # 各维度对坏样本的触发诊断：good vs bad 均值差越大，该维度越能识别坏样本
+    firing = {}
+    good = df[df["quality_level"] == "good"]
+    bad = df[df["quality_level"] == "bad"]
+    for dim in DIMENSIONS:
+        if dim not in df.columns:
+            continue
+        g = float(good[dim].mean())
+        b = float(bad[dim].mean())
+        firing[dim] = {
+            "good_mean": round(g, 2),
+            "bad_mean": round(b, 2),
+            "delta_good_minus_bad": round(g - b, 2),
+        }
+
+    return {"arms": arms, "per_dimension_firing": firing}
+
+
+def run_ablation_only() -> None:
+    """只重算评估器消融并合入现有验证报告，不覆盖既有判别力/一致性/对抗/IVR 结果。"""
+    df = load_eval_results()
+    ablation = ablation_validation(df)
+
+    out_path = RESULTS_DIR / "validation_report.json"
+    report = {}
+    if out_path.exists():
+        with open(out_path, encoding="utf-8") as f:
+            report = json.load(f)
+    report["ablation"] = ablation
+    with open(out_path, "w", encoding="utf-8") as f:
+        json.dump(report, f, ensure_ascii=False, indent=2, default=str)
+
+    print("=== 5.5 评估器消融（已合入 validation_report.json，未覆盖既有结果）===")
+    for name, r in ablation["arms"].items():
+        print(f"  {name}: good={r['means'].get('good')} medium={r['means'].get('medium')} "
+              f"bad={r['means'].get('bad')} d={r.get('cohens_d_good_vs_bad')}")
+    print("  各维度对坏样本触发（good→bad 均值差）:")
+    for dim, f in ablation["per_dimension_firing"].items():
+        print(f"    {dim}: good={f['good_mean']} bad={f['bad_mean']} Δ={f['delta_good_minus_bad']}")
+    print(f"\n已保存至: {out_path}")
+
+
 def run(skip_consistency: bool = False, consistency_samples: int = 10, n_runs: int = 3):
     df = load_eval_results()
     report = {}
@@ -349,6 +445,16 @@ def run(skip_consistency: bool = False, consistency_samples: int = 10, n_runs: i
     report["invariance"] = inv
     print(f"  IVR = {inv['ivr']}（{inv['violations']}/{inv['total_pairs']} 对违反不变性）")
 
+    print("\n=== 5.5 评估器消融（纯规则 / 纯 Judge / 混合）===")
+    ablation = ablation_validation(df)
+    report["ablation"] = ablation
+    for name, r in ablation["arms"].items():
+        print(f"  {name}: good={r['means'].get('good')} medium={r['means'].get('medium')} "
+              f"bad={r['means'].get('bad')} d={r.get('cohens_d_good_vs_bad')}")
+    print("  各维度对坏样本触发（good→bad 均值差）:")
+    for dim, f in ablation["per_dimension_firing"].items():
+        print(f"    {dim}: good={f['good_mean']} bad={f['bad_mean']} Δ={f['delta_good_minus_bad']}")
+
     RESULTS_DIR.mkdir(parents=True, exist_ok=True)
     out_path = RESULTS_DIR / "validation_report.json"
     with open(out_path, "w", encoding="utf-8") as f:
@@ -363,7 +469,12 @@ if __name__ == "__main__":
     parser.add_argument("--skip-consistency", action="store_true", help="跳过重复评测稳定性验证（需调 API）")
     parser.add_argument("--consistency-samples", type=int, default=10)
     parser.add_argument("--n-runs", type=int, default=3)
+    parser.add_argument("--ablation-only", action="store_true",
+                        help="只重算评估器消融并合入现有验证报告（不覆盖其他结果，零 API 调用）")
     args = parser.parse_args()
-    run(skip_consistency=args.skip_consistency,
-        consistency_samples=args.consistency_samples,
-        n_runs=args.n_runs)
+    if args.ablation_only:
+        run_ablation_only()
+    else:
+        run(skip_consistency=args.skip_consistency,
+            consistency_samples=args.consistency_samples,
+            n_runs=args.n_runs)

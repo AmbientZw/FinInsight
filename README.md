@@ -86,6 +86,7 @@ flowchart LR
 | 等价不变性 IVR | 0/30 对违反（**IVR=0.0**），规则维度对形式变化免疫 | [validation_report.json](evaluation/results/validation_report.json) |
 | 引用审计补齐 D2 短板 | D2 判别力 **p=0.13 → p=0.0028**（显著） | [analysis report](docs/分析报告.md) |
 | 硬门禁拦截 | 8 个 bad 样本被封顶（7 结构破坏→2.0，1 数值编造→3.0） | [eval_table.csv](evaluation/results/eval_table.csv) |
+| 评估器消融 | 三臂各留盲区：混入他报数据仅 LLM 识破（Δ2.95）、删免责/破 JSON 仅规则裁决（Δ3.0/1.4）、删出处仅混合收口（Δ1.35） | [validation_report.json](evaluation/results/validation_report.json) |
 
 七维得分分布（好 / 中 / 差三档对比）：
 

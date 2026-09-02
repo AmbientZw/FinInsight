@@ -315,5 +315,73 @@
     "total_pairs": 30,
     "violations": 0,
     "ivr": 0.0
+  },
+  "ablation": {
+    "arms": {
+      "纯规则 (D3+D5+D6)": {
+        "means": {
+          "good": 5.0,
+          "medium": 4.65,
+          "bad": 2.84
+        },
+        "monotonic": true,
+        "cohens_d_good_vs_bad": 4.88
+      },
+      "纯Judge (D1+D4+D7)": {
+        "means": {
+          "good": 4.82,
+          "medium": 3.62,
+          "bad": 3.01
+        },
+        "monotonic": true,
+        "cohens_d_good_vs_bad": 5.07
+      },
+      "混合 (7维 + 硬门禁)": {
+        "means": {
+          "good": 4.87,
+          "medium": 4.16,
+          "bad": 2.87
+        },
+        "monotonic": true,
+        "cohens_d_good_vs_bad": 4.043
+      }
+    },
+    "per_dimension_firing": {
+      "事实准确性": {
+        "good_mean": 4.75,
+        "bad_mean": 1.8,
+        "delta_good_minus_bad": 2.95
+      },
+      "证据可追溯性": {
+        "good_mean": 4.7,
+        "bad_mean": 3.35,
+        "delta_good_minus_bad": 1.35
+      },
+      "数据精确性": {
+        "good_mean": 5.0,
+        "bad_mean": 2.9,
+        "delta_good_minus_bad": 2.1
+      },
+      "信息完整性": {
+        "good_mean": 4.75,
+        "bad_mean": 3.0,
+        "delta_good_minus_bad": 1.75
+      },
+      "结构规范性": {
+        "good_mean": 5.0,
+        "bad_mean": 3.6,
+        "delta_good_minus_bad": 1.4
+      },
+      "安全合规性": {
+        "good_mean": 5.0,
+        "bad_mean": 2.0,
+        "delta_good_minus_bad": 3.0
+      },
+      "专业术语正确性": {
+        "good_mean": 5.0,
+        "bad_mean": 4.65,
+        "delta_good_minus_bad": 0.35
+      }
+    }
   }
 }
